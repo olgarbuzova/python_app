@@ -1,13 +1,7 @@
 from typing import Any, Dict, List
 
 from sqlalchemy import Column, ForeignKey, Integer, Table, UniqueConstraint
-from sqlalchemy.orm import (
-    Mapped,
-    attribute_keyed_dict,
-    mapped_collection,
-    mapped_column,
-    relationship,
-)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
