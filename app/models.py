@@ -1,8 +1,15 @@
 from typing import Any, Dict, List
 
-from database import Base, engine, session
 from sqlalchemy import Column, ForeignKey, Integer, Table, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import (
+    Mapped,
+    attribute_keyed_dict,
+    mapped_collection,
+    mapped_column,
+    relationship,
+)
+
+from app.database import Base
 
 likes_table = Table(
     "likes",
@@ -50,7 +57,6 @@ class User(Base):
         "Tweet",
         back_populates="author",
         cascade="all, delete-orphan",
-        lazy="joined",
     )
 
     def to_json(self) -> Dict[str, Any]:
@@ -60,11 +66,11 @@ class User(Base):
 class Media(Base):
     __tablename__ = "medias"
     id: Mapped[int] = mapped_column(primary_key=True)
-    tweet_id: Mapped[int] = mapped_column(
-        ForeignKey("tweets.id"), nullable=False
-    )
     link: Mapped[str] = mapped_column(nullable=False)
-    tweet = relationship("Tweet", back_populates="attachments", lazy="joined")
+    tweet_id: Mapped[int] = mapped_column(
+        ForeignKey("tweets.id"), nullable=True
+    )
+    tweet = relationship("Tweet", back_populates="attachments")
 
 
 class Tweet(Base):
@@ -74,11 +80,24 @@ class Tweet(Base):
     author_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), nullable=False
     )
+
     attachments: Mapped[List[Media]] = relationship(
-        cascade="all, delete-orphan", lazy="joined"
+        "Media",
+        back_populates="tweet",
+        cascade="all, delete-orphan",
     )
     likes: Mapped[List[User]] = relationship(secondary=likes_table)
     author = relationship("User", back_populates="tweets", lazy="joined")
+
+    def to_json(self) -> Dict[str, Any]:
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class Key(Base):
+    __tablename__ = "keys"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    key: Mapped[str] = mapped_column(nullable=False)
 
     def to_json(self) -> Dict[str, Any]:
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

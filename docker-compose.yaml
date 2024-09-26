@@ -1,0 +1,27 @@
+services:
+  frontend:
+    build:
+      context: .
+    ports:
+      - 80:80
+    volumes:
+      - ./medias:/usr/share/nginx/html/medias
+
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-backend
+  #   environment:
+  #     - PG_USER=test
+  #     - PG_PASSWORD=test
+  #     - PG_DATABASE=test
+  #     - PG_HOST=db
+    
+  db:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DATABASE=test
