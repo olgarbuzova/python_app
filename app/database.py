@@ -8,9 +8,18 @@ PG_PASSWORD = os.environ.get("PG_PASSWORD")
 PG_HOST = os.environ.get("PG_HOST")
 PG_DATABASE = os.environ.get("PG_DATABASE")
 
-engine = create_engine(f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DATABASE}")
+engine = create_engine(
+    f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DATABASE}"
+)
 Session = sessionmaker(bind=engine)
-session = Session()
+
+
+def get_db():
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 class Base(DeclarativeBase):

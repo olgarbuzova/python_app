@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.database import Base, engine, session
+from app.database import Base, engine
 from app.routes import create_routes
 
 
@@ -12,7 +12,7 @@ from app.routes import create_routes
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(engine)
     yield
-    await engine.dispose()
+    engine.dispose()
 
 
 app = FastAPI(lifespan=lifespan)

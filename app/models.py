@@ -95,24 +95,3 @@ class Key(Base):
 
     def to_json(self) -> Dict[str, Any]:
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-
-# Base.metadata.create_all(engine)
-
-# user1 = User(name="test1")
-# user2 = User(name="test2")
-# user3 = User(name="test3")
-# user4 = User(name="test4", followers=[user1, user2], following=[user3])
-
-# session.add_all([user1, user2, user3, user4])
-# # session.commit()
-
-# tweet1 = Tweet(content="vvv", author=user1)
-# session.add_all([tweet1])
-# session.commit()
-# media1 = Media(link="/", tweet=tweet1)
-
-# tweet1.likes.append(user2)
-
-# session.add_all([media1])
-# session.commit()
