@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from fastapi import Depends
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,7 +11,7 @@ from app.database import Base, get_db
 from app.main import app
 from app.models import Key, User
 
-from . import settings
+load_dotenv(dotenv_path=".env.testing", override=True)
 
 PG_USER = os.environ.get("PG_USER")
 PG_PASSWORD = os.environ.get("PG_PASSWORD")

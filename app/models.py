@@ -61,9 +61,7 @@ class Media(Base):
     __tablename__ = "medias"
     id: Mapped[int] = mapped_column(primary_key=True)
     link: Mapped[str] = mapped_column(nullable=False)
-    tweet_id: Mapped[int] = mapped_column(
-        ForeignKey("tweets.id"), nullable=True
-    )
+    tweet_id: Mapped[int] = mapped_column(ForeignKey("tweets.id"), nullable=True)
     tweet = relationship("Tweet", back_populates="attachments")
 
 
@@ -71,9 +69,7 @@ class Tweet(Base):
     __tablename__ = "tweets"
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str] = mapped_column(nullable=False)
-    author_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False
-    )
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     attachments: Mapped[List[Media]] = relationship(
         "Media",

@@ -18,9 +18,7 @@ def test_upload_media():
     image_content = b"test image"
     image_file = BytesIO(image_content)
     files = {"file": ("image.jpg", image_file, "image/jpeg")}
-    response = client.post(
-        "/api/medias", files=files, headers={"Api-Key": user_key}
-    )
+    response = client.post("/api/medias", files=files, headers={"Api-Key": user_key})
     assert response.status_code == 200
     result = response.json()
     assert result == {"media_id": 1, "result": True}
@@ -67,15 +65,11 @@ def test_delete_like():
 def test_follow_user():
     user_key_1 = TEST_USER["api_key"]
     user_key_2 = FAKE_USER["api_key"]
-    response_1 = client.post(
-        "/api/users/2/follow", headers={"Api-Key": user_key_1}
-    )
+    response_1 = client.post("/api/users/2/follow", headers={"Api-Key": user_key_1})
     result_1 = response_1.json()
     assert response_1.status_code == 200
     assert result_1.get("result") is True
-    response_2 = client.post(
-        "/api/users/1/follow", headers={"Api-Key": user_key_2}
-    )
+    response_2 = client.post("/api/users/1/follow", headers={"Api-Key": user_key_2})
     result_2 = response_2.json()
     assert response_2.status_code == 200
     assert result_2.get("result") is True
@@ -95,9 +89,7 @@ def test_get_info_user():
     username = FAKE_USER["username"]
     user_id = 2
     user_key = TEST_USER["api_key"]
-    response = client.get(
-        f"/api/users/{user_id}", headers={"Api-Key": user_key}
-    )
+    response = client.get(f"/api/users/{user_id}", headers={"Api-Key": user_key})
     result_data = response.json()
     assert response.status_code == 200
     assert result_data.get("user").get("name") == username
@@ -106,9 +98,7 @@ def test_get_info_user():
 
 def test_unfollow_user():
     user_key = TEST_USER["api_key"]
-    response = client.delete(
-        "/api/users/2/follow", headers={"Api-Key": user_key}
-    )
+    response = client.delete("/api/users/2/follow", headers={"Api-Key": user_key})
     result = response.json()
     assert response.status_code == 200
     assert result.get("result") is True
@@ -125,9 +115,7 @@ def test_get_tweets():
 def test_delete_tweet_by_wrong_user():
     user_key = FAKE_USER["api_key"]
     tweet_id = 1
-    response = client.delete(
-        f"/api/tweets/{tweet_id}", headers={"Api-Key": user_key}
-    )
+    response = client.delete(f"/api/tweets/{tweet_id}", headers={"Api-Key": user_key})
     result_data = response.json()
     assert response.status_code == 400
     assert schema(error_shema) == result_data
@@ -136,9 +124,7 @@ def test_delete_tweet_by_wrong_user():
 def test_delete_tweet():
     user_key = TEST_USER["api_key"]
     tweet_id = 1
-    response = client.delete(
-        f"/api/tweets/{tweet_id}", headers={"Api-Key": user_key}
-    )
+    response = client.delete(f"/api/tweets/{tweet_id}", headers={"Api-Key": user_key})
     result_data = response.json()
     assert response.status_code == 200
     assert result_data.get("result") is True
