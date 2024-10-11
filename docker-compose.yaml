@@ -1,21 +1,28 @@
 services:
   frontend:
+    depends_on:
+      - backend
     build:
       context: .
     ports:
       - 80:80
     volumes:
-      - ./medias:/usr/share/nginx/html/medias
+      - medias:/usr/share/nginx/html/medias
 
-  # backend:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-backend
-  #   environment:
-  #     - PG_USER=test
-  #     - PG_PASSWORD=test
-  #     - PG_DATABASE=test
-  #     - PG_HOST=db
+  backend:
+    restart: on-failure:3
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile-backend
+    environment:
+      - PG_USER=test
+      - PG_PASSWORD=test
+      - PG_DATABASE=dev
+      - PG_HOST=db
+    volumes:
+      - medias:/medias
     
   db:
     image: postgres:latest
@@ -25,3 +32,6 @@ services:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
       - POSTGRES_DB=dev
+
+volumes:
+  medias:
