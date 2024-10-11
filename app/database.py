@@ -9,7 +9,8 @@ PG_HOST = os.environ.get("PG_HOST")
 PG_DATABASE = os.environ.get("PG_DATABASE")
 
 engine = create_engine(
-    f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DATABASE}"
+    f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DATABASE}",
+    pool_pre_ping=True,
 )
 Session = sessionmaker(bind=engine)
 

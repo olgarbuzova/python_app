@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.database import get_db
-from app.models import Key
+from app.models import Key, User
 
 API_KEY = APIKeyHeader(name="Api-Key")
 
@@ -31,3 +31,15 @@ def check_authentication_key(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid API Key",
     )
+
+
+def create_first_user_for_login(db: Session):
+    query = select(Key).where(Key.key == "test")
+    result_key = db.scalars(query).one_or_none()
+    if result_key is None:
+        user = User(name="first user")
+        db.add(user)
+        db.commit()
+        key = Key(user_id=user.id, key="test")
+        db.add(key)
+        db.commit()
