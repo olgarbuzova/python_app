@@ -30,9 +30,7 @@ if database_exists(TEST_DATABASE_URL):
 create_database(TEST_DATABASE_URL)
 
 Base.metadata.create_all(test_engine)
-TestingSession = sessionmaker(
-    autoflush=False, bind=test_engine, expire_on_commit=False
-)
+TestingSession = sessionmaker(autoflush=False, bind=test_engine, expire_on_commit=False)
 
 
 def override_get_db():
