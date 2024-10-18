@@ -75,7 +75,11 @@ def create_routes(app):
         with filename_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         try:
-            query = insert(Media).values(link=f"medias/{filename}").returning(Media.id)
+            query = (
+                insert(Media)
+                .values(link=f"medias/{filename}")
+                .returning(Media.id)
+            )
             media_id = db.execute(query).fetchone()
             db.commit()
             if media_id:
@@ -97,8 +101,6 @@ def create_routes(app):
         try:
             query = select(Tweet).where(Tweet.id == tweet_id)
             tweet = db.scalars(query).one()
-            # tweet = db.execute(query).unique()
-            # tweet = tweet.scalar_one()
             if tweet.author_id == user_id:
                 db.delete(tweet)
                 db.commit()
@@ -217,23 +219,38 @@ def create_routes(app):
         db: Session = Depends(get_db),
     ):
         """Get tweet feed"""
+        user_id = auth.get("user_id")
         try:
             query = select(Tweet).options(joinedload(Tweet.attachments))
             tweets = db.scalars(query).unique().all()
-            tweets_new = [
+            tweets_sorter_likes = sorted(
+                tweets, key=lambda x: len(x.likes), reverse=True
+            )
+            tweets_sorter_follower = sorted(
+                tweets_sorter_likes,
+                key=lambda x: (
+                    True
+                    if user_id in [u.id for u in x.author.followers]
+                    else False
+                ),
+                reverse=True,
+            )
+            tweets_result = [
                 {
                     "id": tw.id,
                     "content": tw.content,
                     "attachments": [ta.link for ta in tw.attachments],
-                    "author": tw.author,
-                    "likes": [{"user_id": tl.id, "name": tl.name} for tl in tw.likes],
+                    "author": {"id": tw.author.id, "name": tw.author.name},
+                    "likes": [
+                        {"user_id": tl.id, "name": tl.name} for tl in tw.likes
+                    ],
                 }
-                for tw in tweets
+                for tw in tweets_sorter_follower
             ]
-            return {"tweets": tweets_new} | RESULT_TRUE
-        except Exception:
+            return {"tweets": tweets_result} | RESULT_TRUE
+        except Exception as e:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Not found"
+                status_code=status.HTTP_400_BAD_REQUEST, detail=e.args[0]
             )
 
     @app.get("/api/users/me")
