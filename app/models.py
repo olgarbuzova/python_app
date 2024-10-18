@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import List
 
 from sqlalchemy import Column, ForeignKey, Integer, Table, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -53,15 +53,14 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
-    def to_json(self) -> Dict[str, Any]:
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
 
 class Media(Base):
     __tablename__ = "medias"
     id: Mapped[int] = mapped_column(primary_key=True)
     link: Mapped[str] = mapped_column(nullable=False)
-    tweet_id: Mapped[int] = mapped_column(ForeignKey("tweets.id"), nullable=True)
+    tweet_id: Mapped[int] = mapped_column(
+        ForeignKey("tweets.id"), nullable=True
+    )
     tweet = relationship("Tweet", back_populates="attachments")
 
 
@@ -69,7 +68,9 @@ class Tweet(Base):
     __tablename__ = "tweets"
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str] = mapped_column(nullable=False)
-    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    author_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), nullable=False
+    )
 
     attachments: Mapped[List[Media]] = relationship(
         "Media",
@@ -79,15 +80,9 @@ class Tweet(Base):
     likes: Mapped[List[User]] = relationship(secondary=likes_table)
     author = relationship("User", back_populates="tweets", lazy="joined")
 
-    def to_json(self) -> Dict[str, Any]:
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
 
 class Key(Base):
     __tablename__ = "keys"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     key: Mapped[str] = mapped_column(nullable=False)
-
-    def to_json(self) -> Dict[str, Any]:
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

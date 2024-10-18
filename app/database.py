@@ -1,4 +1,5 @@
 import os
+from typing import Any, Dict
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
@@ -24,4 +25,6 @@ def get_db():
 
 
 class Base(DeclarativeBase):
-    pass
+
+    def to_json(self) -> Dict[str, Any]:
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
